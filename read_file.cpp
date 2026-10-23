@@ -2,6 +2,8 @@
 #include <QFile>
 #include <QDataStream>
 #include <QDebug>
+#include <QList>
+#include <QString>
 
 #include <cstdlib>
 
@@ -10,7 +12,11 @@
 int main(int argc, char *argv[])
 {
   QFile file("temp.dat");
-  file.open(QIODevice::ReadOnly);
+  if (!file.open(QIODevice::ReadOnly)){
+    qDebug() << "Error: unable to open file for reading.";
+    return EXIT_FAILURE;
+  }
+
   QDataStream in(&file);
 
   // Read and check the header
@@ -33,10 +39,13 @@ int main(int argc, char *argv[])
   in.setVersion(QDataStream::Qt_5_0);
 
   // Read the data
-  QString msg;
-  in >> msg;
+  QList<QString> list;
+  in >> list;
 
-  qDebug() << "Read data from a file: " << msg;
-  
+  qDebug() << "Read data from a file: ";
+  for (const QString &msg : list) {
+    qDebug() << "-" << msg;
+  }
+
   return EXIT_SUCCESS;
 }
